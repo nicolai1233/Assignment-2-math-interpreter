@@ -1,0 +1,38 @@
+grammar org.xtext.example.MathExample2 with org.eclipse.xtext.common.Terminals
+
+generate mathExample2 "http://www.xtext.org/example/MathExample2"
+
+// generate "Hello" then "world" or "there" then repeat 7 "!" or "?"
+// generate "Hello"
+// generate "a" or "b" or "c"
+
+MathExp:
+	'result' 'is' exp=Exp;
+	
+Exp returns TextExp:
+	exp1=ExpMin ( '+' {Plus.exp1=current} exp2=ExpMin)*
+	;
+
+ExpMin returns TextExp:
+	exp1=ExpMult ('-'{Minus.exp1=current} exp2 = ExpMult)*
+;
+
+
+ExpMult returns TextExp: // Precedence: '*' is stronger than '+ or -'
+	exp1=ExpDiv ('*' {Mult.exp1=current} exp2=ExpDiv)*
+;
+
+ExpDiv returns TextExp: // Precedence: '/' is stronger than '+ or -'
+	exp1=TextPrim ('/' {Div.exp1=current} exp2=TextPrim)*
+;
+
+TextPrim returns TextExp: 
+	Numbers | Parenthesis
+;
+
+Numbers:	
+	value=INT
+;
+
+Parenthesis:	'(' exp=Exp ')'	
+;
